@@ -1,0 +1,74 @@
+### Example ESPHome configuration using the DBC component
+# WARNING: This (currently) requires to *manually* install the pip package 'cantools' inside the ESPHome docker container
+# You can achieve this on supervised Home Assistant installations by running:
+# ha > login
+# # docker ps | grep esphome
+# # docker exec -it <container_id> bash
+# # pip install cantools
+# This is required each time the add-on is updated!
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/robin-thoni/esphome-components
+      ref: main
+    components:
+      - dbc
+
+# [...]
+
+canbus:
+  - platform: esp32_can
+    id: canbus_id
+    tx_pin: GPIO17
+    rx_pin: GPIO16
+    rx_queue_len: 50
+    bit_rate: 500KBPS
+    can_id: 1
+
+dbc:
+  - id: tesla_model3_vehicle
+    file: /config/esphome/tesla_model3_vehicle.dbc
+    # https://github.com/commaai/opendbc/blob/master/opendbc/dbc/tesla_model3_vehicle.dbc
+  - id: Model3CAN
+    file: /config/esphome/Model3CAN.dbc
+    # https://github.com/joshwardell/model3dbc/blob/master/Model3CAN.dbc
+
+sensor:
+  - platform: dbc
+    id: dbc_steering_wheel_left_scroll_double_press
+    name: Steering Wheel Left Scroll Double Press
+    signal:
+      dbc_id: Model3CAN
+      message: ID3C2VCLEFT_switchStatus
+      signal: VCLEFT_swcLeftDoublePress
+  - platform: dbc
+    id: dbc_steering_wheel_right_scroll_double_press
+    name: Steering Wheel Right Scroll Double Press
+    signal:
+      dbc_id: Model3CAN
+      message: ID3C2VCLEFT_switchStatus
+      signal: VCLEFT_swcRightDoublePress
+  - platform: dbc
+    id: dbc_ceiling_hazard_light_pressed
+    name: Ceiling Hazard Light Pressed
+    signal:
+      dbc_id: Model3CAN
+      message: ID3C2VCLEFT_switchStatus
+      signal: VCLEFT_hazardButtonPressed
+
+text_sensor:
+  - platform: dbc
+    id: dbc_left_stalk_turn_signal
+    name: Left Stalk Turn Signal
+    signal:
+      dbc_id: Model3CAN
+      message: ID249SCCMLeftStalk
+      signal: SCCM_turnIndicatorStalkStatus
+  - platform: dbc
+    id: dbc_left_stack_high_beam
+    name: Left Stalk High Beam
+    signal:
+      dbc_id: Model3CAN
+      message: ID249SCCMLeftStalk
+      signal: SCCM_highBeamStalkStatus
