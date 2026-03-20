@@ -121,9 +121,12 @@ void SocketcandServer::on_client_data(const uint8_t* data, size_t length) {
 
 void SocketcandServer::on_can_data(uint32_t can_id, const uint8_t* data, size_t length) {
     if (mode_ == RAW) {
+        const auto& now = get_time_us(); // TODO 64 bits timestamp
+        const auto& now_sec = now / 1000000.0f;
+        const auto& now_str = std::to_string(now_sec);
         const auto& can_id_hex = format_hex({(uint8_t)((can_id >> 8) & 0xFF), (uint8_t)(can_id & 0xFF)}, false).substr(1);
         const auto& data_hex = format_hex(data, length, false);
-        send_client_response_raw("frame " + can_id_hex + " 0.0 " + data_hex);
+        send_client_response_raw("frame " + can_id_hex + " " + now_str + " " + data_hex);
     }
 }
 
