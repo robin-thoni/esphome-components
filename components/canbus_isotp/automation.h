@@ -30,11 +30,11 @@ template<typename... Ts> class SendMessage : public Action<Ts...> {
 
 };
 
-class MessageTrigger : public Trigger<const std::vector<uint8_t>&> {
+class MessageTrigger : public Trigger<uint32_t, const std::vector<uint8_t>&> {
     public:
         MessageTrigger(CanbusISOTPComponent *isotp) {
-            isotp->add_callback([this](const std::vector<uint8_t>& data) {
-                this->trigger(data);
+            isotp->add_callback([this](uint32_t can_id, const std::vector<uint8_t>& data) {
+                this->trigger(can_id, data);
             });
         }
 };

@@ -27,7 +27,7 @@ class CanbusISOTPComponent : public Component {
         }
 
         void add_callback(
-            std::function<void(const std::vector<uint8_t> &data)> callback) {
+            std::function<void(uint32_t can_id, const std::vector<uint8_t> &data)> callback) {
             this->callback_manager_.add(std::move(callback));
         }
 
@@ -45,7 +45,7 @@ class CanbusISOTPComponent : public Component {
 
         IsoTpLink link_;
 
-        CallbackManager<void(const std::vector<uint8_t> &data)> callback_manager_{};
+        CallbackManager<void(uint32_t can_id, const std::vector<uint8_t> &data)> callback_manager_{};
 
 };
 

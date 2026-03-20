@@ -80,7 +80,7 @@ void CanbusISOTPComponent::on_message(const uint8_t* data, uint32_t size) {
     ESP_LOGD(TAG, "received can iso-tp message std can_id=0x%03" PRIx32 " size=%d", rx_can_id_, size);
     std::vector<uint8_t> data_vector;
     data_vector.assign(data, data + size);
-    callback_manager_(data_vector);
+    callback_manager_(rx_can_id_, data_vector);
 }
 
 }

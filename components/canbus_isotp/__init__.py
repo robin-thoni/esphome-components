@@ -19,7 +19,7 @@ canbus_isotp_ns = cg.esphome_ns.namespace('canbus_isotp')
 CanbusISOTPComponent = canbus_isotp_ns.class_('CanbusISOTPComponent', cg.Component)
 
 MessageTrigger = canbus_isotp_ns.class_(
-    "MessageTrigger", automation.Trigger.template(cg.std_vector.template(cg.uint8))
+    "MessageTrigger", automation.Trigger.template(cg.uint32, cg.std_vector.template(cg.uint8))
 )
 
 SendMessage = canbus_isotp_ns.class_("SendMessage", automation.Action)
@@ -83,5 +83,5 @@ async def to_code(config):
 
     for conf in config.get(CONF_ON_MESSAGE, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
-        await automation.build_automation(trigger, [(cg.std_vector.template(cg.uint8).operator("ref").operator("const"), 'data')], conf)
+        await automation.build_automation(trigger, [(cg.uint32, "can_id"), (cg.std_vector.template(cg.uint8).operator("ref").operator("const"), 'data')], conf)
 
