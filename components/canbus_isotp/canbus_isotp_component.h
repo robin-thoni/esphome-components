@@ -40,8 +40,8 @@ class CanbusISOTPComponent : public Component {
         uint32_t tx_can_id_{0};
         uint32_t rx_can_id_{0};
 
-        uint8_t tx_buffer_[4096];
-        uint8_t rx_buffer_[4096];
+        uint8_t tx_buffer_[256];
+        uint8_t rx_buffer_[256];
 
         IsoTpLink link_;
 
