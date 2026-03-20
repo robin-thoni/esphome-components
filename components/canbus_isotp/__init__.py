@@ -37,9 +37,19 @@ CONFIG_SCHEMA = cv.Schema({
     ),
 }).extend(cv.COMPONENT_SCHEMA)
 
+def validate_raw_data(value):
+    if isinstance(value, str):
+        return value.encode("utf-8")
+    if isinstance(value, list):
+        return cv.Schema([cv.hex_uint8_t])(value)
+    raise cv.Invalid(
+        "data must either be a string wrapped in quotes or a list of bytes"
+    )
+
+
 SEND_MESSAGE_SCHEMA = cv.Schema({
     cv.GenerateID(CONF_ID): cv.use_id(CanbusISOTPComponent),
-    cv.Required(CONF_DATA): cv.templatable(cv.ensure_list(cv.hex_uint8_t)),
+    cv.Required(CONF_DATA): cv.templatable(validate_raw_data),
 })
 
 @automation.register_action("canbus_isotp.send", SendMessage, SEND_MESSAGE_SCHEMA)
