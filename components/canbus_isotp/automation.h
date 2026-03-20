@@ -9,7 +9,7 @@ template<typename... Ts> class SendMessage : public Action<Ts...> {
     public:
         explicit SendMessage(CanbusISOTPComponent *isotp) : isotp_(isotp) {}
 
-        void play(Ts... x) override {
+        void play(const Ts &... x) override {
             const auto& data = data_func_ ? data_func_(x...) : data_;
             this->isotp_->send_data(data);
         }
