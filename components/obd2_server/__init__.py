@@ -14,6 +14,7 @@ from .const import (
     CONF_SENSORS,
     CONF_SENSORS_MIL_STATUS,
     CONF_SENSORS_ENGINE_SPEED,
+    CONF_SENSORS_VEHICLE_SPEED,
     CONF_EMISSON_TESTS,
 )
 
@@ -26,6 +27,7 @@ OBD2ServerComponent = obd2_ns.class_('OBD2ServerComponent', cg.Component)
 SENSORS_DEF = {
     CONF_SENSORS_MIL_STATUS: binary_sensor.BinarySensor,
     CONF_SENSORS_ENGINE_SPEED: sensor.Sensor,
+    CONF_SENSORS_VEHICLE_SPEED: sensor.Sensor,
 }
 
 MULTI_CONF = True

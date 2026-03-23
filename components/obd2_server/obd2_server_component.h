@@ -89,6 +89,8 @@ protected:
 
     OBD2_SERVER_DEFINE_SENSOR(engine_speed);
 
+    OBD2_SERVER_DEFINE_SENSOR(vehicle_speed);
+
     #ifdef USE_BINARY_SENSOR
     binary_sensor::BinarySensor* emission_tests_[11]{nullptr};
     #endif

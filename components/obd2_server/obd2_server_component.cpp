@@ -102,6 +102,10 @@ void OBD2ServerComponent::setup() {
                             (uint8_t)((int)(OBD2_SERVER_SENSOR_STATE(engine_speed, 0) * 4) / 256),
                             (uint8_t)((int)(OBD2_SERVER_SENSOR_STATE(engine_speed, 0) * 4) % 256)
                         });
+                    } else if (obd2_pid == 0x0D) {
+                        reply_obd2(obd2_service, obd2_pid, {
+                            (uint8_t)OBD2_SERVER_SENSOR_STATE(vehicle_speed, 0)
+                        });
                     }
                 } else if (obd2_service == 0x09 && data.size() >= 2) {
                     const auto& obd2_pid = data[1];
@@ -197,7 +201,7 @@ const std::vector<std::vector<void*> > OBD2ServerComponent::get_required_values_
                 OBD2_SERVER_BINARY_SENSOR_POINTER(engine_speed),
             },
             {    // 0x0D  - Vehicle speed
-                nullptr,
+                OBD2_SERVER_BINARY_SENSOR_POINTER(vehicle_speed),
             },
         };
     } else if (service == 0x09) {
