@@ -3,6 +3,7 @@ import esphome.config_validation as cv
 from esphome import automation
 from esphome.components import canbus_isotp
 from esphome.components import binary_sensor
+from esphome.components import sensor
 from esphome.components import switch
 from esphome.types import ConfigType
 from .const import (
@@ -12,6 +13,7 @@ from .const import (
     CONF_VIN,
     CONF_SENSORS,
     CONF_SENSORS_MIL_STATUS,
+    CONF_SENSORS_ENGINE_SPEED,
     CONF_EMISSON_TESTS,
 )
 
@@ -23,6 +25,7 @@ OBD2ServerComponent = obd2_ns.class_('OBD2ServerComponent', cg.Component)
 
 SENSORS_DEF = {
     CONF_SENSORS_MIL_STATUS: binary_sensor.BinarySensor,
+    CONF_SENSORS_ENGINE_SPEED: sensor.Sensor,
 }
 
 MULTI_CONF = True

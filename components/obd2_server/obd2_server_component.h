@@ -5,6 +5,9 @@
 #ifdef USE_BINARY_SENSOR
 #include "esphome/components/binary_sensor/binary_sensor.h"
 #endif
+#ifdef USE_SENSOR
+#include "esphome/components/sensor/sensor.h"
+#endif
 #ifdef USE_SWITCH
 #include "esphome/components/switch/switch.h"
 #endif
@@ -83,6 +86,8 @@ protected:
     std::string vin_;
 
     OBD2_SERVER_DEFINE_BINARY_SENSOR(mil_status);
+
+    OBD2_SERVER_DEFINE_SENSOR(engine_speed);
 
     #ifdef USE_BINARY_SENSOR
     binary_sensor::BinarySensor* emission_tests_[11]{nullptr};

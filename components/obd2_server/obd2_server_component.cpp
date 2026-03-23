@@ -21,6 +21,14 @@ static const char *const TAG = "obd2_server";
 #define OBD2_SERVER_BINARY_SENSOR_STATE(name, default_) default_
 #endif
 
+#ifdef USE_SENSOR
+#define OBD2_SERVER_SENSOR_IS_PRESENT(name)
+#define OBD2_SERVER_SENSOR_STATE(name, default_) OBD2_SERVER_SENSOR_STATE_(name, default_)
+#else
+#define OBD2_SERVER_SENSOR_IS_PRESENT(name) false
+#define OBD2_SERVER_SENSOR_STATE(name, default_) default_
+#endif
+
 #define OBD2_SERVER_BINARY_SENSOR_ENCODE_STATE(name, value, bit, default_) \
     if (OBD2_SERVER_BINARY_SENSOR_STATE(name, default_)) { \
         OBD2_SERVER_SET_MSB_BIT(value, bit); \
@@ -89,6 +97,11 @@ void OBD2ServerComponent::setup() {
                         }
                         #endif
                         reply_obd2(obd2_service, obd2_pid, encode_value(status));
+                    } else if (obd2_pid == 0x0C) {
+                        reply_obd2(obd2_service, obd2_pid, {
+                            (uint8_t)((int)(OBD2_SERVER_SENSOR_STATE(engine_speed, 0) * 4) / 256),
+                            (uint8_t)((int)(OBD2_SERVER_SENSOR_STATE(engine_speed, 0) * 4) % 256)
+                        });
                     }
                 } else if (obd2_service == 0x09 && data.size() >= 2) {
                     const auto& obd2_pid = data[1];
@@ -149,6 +162,42 @@ const std::vector<std::vector<void*> > OBD2ServerComponent::get_required_values_
             {}, // 0x00 - PIDs supported [$01 - $20] 
             {   // 0x01 - Monitor status since DTCs cleared
                 OBD2_SERVER_BINARY_SENSOR_POINTER(mil_status),
+            },
+            {    // 0x02  - DTC that caused freeze frame to be stored
+                nullptr,
+            },
+            {    // 0x03  - Fuel system status
+                nullptr,
+            },
+            {    // 0x04  - Calculated engine load
+                nullptr,
+            },
+            {    // 0x05  -  Engine coolant temperature
+                nullptr,
+            },
+            {    // 0x06  - Short term fuel trim (STFT)—Bank 1
+                nullptr,
+            },
+            {    // 0x07  - Long term fuel trim (LTFT)—Bank 1
+                nullptr,
+            },
+            {    // 0x08  - Short term fuel trim (STFT)—Bank 2
+                nullptr,
+            },
+            {    // 0x09  - Long term fuel trim (LTFT)—Bank 2
+                nullptr,
+            },
+            {    // 0x0A  - Fuel pressure
+                nullptr,
+            },
+            {    // 0x0B  - Intake manifold absolute pressure
+                nullptr,
+            },
+            {    // 0x0C  - Engine speed
+                OBD2_SERVER_BINARY_SENSOR_POINTER(engine_speed),
+            },
+            {    // 0x0D  - Vehicle speed
+                nullptr,
             },
         };
     } else if (service == 0x09) {
