@@ -56,8 +56,9 @@ async def to_code(config):
 
     if CONF_SENSORS in config:
         for sensor_name, sensor_type in SENSORS_DEF.items():
-            sensor = await cg.get_variable(config[CONF_SENSORS][sensor_name])
-            cg.add(getattr(var, "set_" + sensor_name)(sensor))
+            if sensor_name in config[CONF_SENSORS]:
+                sensor = await cg.get_variable(config[CONF_SENSORS][sensor_name])
+                cg.add(getattr(var, "set_" + sensor_name)(sensor))
 
     if CONF_EMISSON_TESTS in config:
         for sensor_idx, sensor_id in config[CONF_EMISSON_TESTS].items():
