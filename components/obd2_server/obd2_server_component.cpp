@@ -107,6 +107,24 @@ void OBD2ServerComponent::setup() {
                             (uint8_t)OBD2_SERVER_SENSOR_STATE(vehicle_speed, 0)
                         });
                     }
+                } else if (obd2_service == 0x03) {
+                    std::vector<uint8_t> data;
+                    for (const auto& dtc_tuple : dtcs_stored_) {
+                        if (dtc_tuple.second->state == 0xFF) {
+                            data.push_back((dtc_tuple.first >> 8) & 0xFF);
+                            data.push_back(dtc_tuple.first & 0xFF);
+                        }
+                    }
+                    reply_obd2(obd2_service, 0, data);
+                } else if (obd2_service == 0x07) {
+                    std::vector<uint8_t> data;
+                    for (const auto& dtc_tuple : dtcs_stored_) {
+                        if (dtc_tuple.second->state != 0x00 && dtc_tuple.second->state != 0xFF) {
+                            data.push_back((dtc_tuple.first >> 8) & 0xFF);
+                            data.push_back(dtc_tuple.first & 0xFF);
+                        }
+                    }
+                    reply_obd2(obd2_service, 0, data);
                 } else if (obd2_service == 0x09 && data.size() >= 2) {
                     const auto& obd2_pid = data[1];
                     if (!is_pid_supported(obd2_service, obd2_pid)) {
@@ -128,6 +146,15 @@ void OBD2ServerComponent::setup() {
                         encoded_str.insert(encoded_str.end(), name.begin(), name.end());
                         reply_obd2(obd2_service, obd2_pid, encoded_str);
                     }
+                } else if (obd2_service == 0x0A) {
+                    std::vector<uint8_t> data;
+                    for (const auto& dtc_tuple : dtcs_permanent_) {
+                        if (dtc_tuple.second->state) {
+                            data.push_back((dtc_tuple.first >> 8) & 0xFF);
+                            data.push_back(dtc_tuple.first & 0xFF);
+                        }
+                    }
+                    reply_obd2(obd2_service, 0, data);
                 }
             }
         });

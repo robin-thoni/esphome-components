@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include "esphome/core/component.h"
 #include "esphome/components/canbus_isotp/canbus_isotp_component.h"
 #ifdef USE_BINARY_SENSOR
@@ -70,6 +71,10 @@ public:
 
     #ifdef USE_BINARY_SENSOR
     void set_emission_test(uint8_t index, binary_sensor::BinarySensor* emission_test) { emission_tests_[index] = emission_test; }
+    void add_dtc(uint16_t dtc, binary_sensor::BinarySensor* sensor) { dtcs_permanent_[dtc] = sensor; }
+    #endif
+    #ifdef USE_SENSOR
+    void add_dtc(uint16_t dtc, sensor::Sensor* sensor) { dtcs_stored_[dtc] = sensor; }
     #endif
 
 protected:
@@ -93,6 +98,11 @@ protected:
 
     #ifdef USE_BINARY_SENSOR
     binary_sensor::BinarySensor* emission_tests_[11]{nullptr};
+
+    std::map<uint16_t, binary_sensor::BinarySensor*> dtcs_permanent_;
+    #endif
+    #ifdef USE_SENSOR
+    std::map<uint16_t, sensor::Sensor*> dtcs_stored_;
     #endif
 
 };

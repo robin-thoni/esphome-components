@@ -8,6 +8,8 @@ from esphome.components import switch
 from esphome.types import ConfigType
 from .const import (
     CONF_ID,
+    CONF_NAME,
+    CONF_SENSOR,
     CONF_CANBUS_ISOTP_IDS,
     CONF_ENGINE_TYPE,
     CONF_VIN,
@@ -16,6 +18,10 @@ from .const import (
     CONF_SENSORS_ENGINE_SPEED,
     CONF_SENSORS_VEHICLE_SPEED,
     CONF_EMISSON_TESTS,
+    CONF_DTC,
+    CONF_DTC_TYPE,
+    CONF_DTC_TYPE_PERMANENT,
+    CONF_DTC_TYPE_STORED,
 )
 
 CODEOWNERS = ["@robin-thoni"]
@@ -30,6 +36,28 @@ SENSORS_DEF = {
     CONF_SENSORS_VEHICLE_SPEED: sensor.Sensor,
 }
 
+
+def dtc_name_to_int(dtc_name) -> int:
+    cats = ['P', 'C', 'B', 'U']
+    if len(dtc_name) != 5 or dtc_name[0] not in cats:
+        return None
+
+    cat_value = cats.index(dtc_name[0])
+    try:
+        dtc_code = int(dtc_name[1:], 16)
+    except:
+        return None
+
+    return (cat_value << 14) | dtc_code
+
+
+def validate_dtc_name_(value):
+    dtc_value = dtc_name_to_int(value)
+    if dtc_value is None:
+        raise cv.Invalid("Invalid DTC name")
+    return value
+
+
 MULTI_CONF = True
 CONFIG_SCHEMA = cv.Schema({
         cv.GenerateID(): cv.declare_id(OBD2ServerComponent),
@@ -43,6 +71,18 @@ CONFIG_SCHEMA = cv.Schema({
         cv.Optional(CONF_EMISSON_TESTS): {
             cv.int_range(0, 10): cv.use_id(binary_sensor.BinarySensor),
         },
+        cv.Optional(CONF_DTC): cv.ensure_list(cv.typed_schema({
+                CONF_DTC_TYPE_STORED: cv.Schema({
+                    cv.Required(CONF_NAME): validate_dtc_name_,
+                    cv.Required(CONF_SENSOR): cv.use_id(sensor.Sensor),
+                }),
+                CONF_DTC_TYPE_PERMANENT: cv.Schema({
+                    cv.Required(CONF_NAME): validate_dtc_name_,
+                    cv.Required(CONF_SENSOR): cv.use_id(binary_sensor.BinarySensor),
+                }),
+            },
+            key=CONF_DTC_TYPE,
+        )),
     }).extend(cv.COMPONENT_SCHEMA)
 
 
@@ -66,6 +106,11 @@ async def to_code(config):
         for sensor_idx, sensor_id in config[CONF_EMISSON_TESTS].items():
             sensor = await cg.get_variable(sensor_id)
             cg.add(var.set_emission_test(sensor_idx, sensor))
+
+    if CONF_DTC in config:
+        for dtc_config in config[CONF_DTC]:
+            sensor = await cg.get_variable(dtc_config[CONF_SENSOR])
+            cg.add(var.add_dtc(dtc_name_to_int(dtc_config[CONF_NAME]), sensor))
 
 
     await cg.register_component(var, config)
