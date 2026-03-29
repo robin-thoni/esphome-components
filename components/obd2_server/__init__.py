@@ -10,6 +10,7 @@ from .const import (
     CONF_ID,
     CONF_NAME,
     CONF_SENSOR,
+    CONF_TRIGGER_ID,
     CONF_CANBUS_ISOTP_IDS,
     CONF_ENGINE_TYPE,
     CONF_VIN,
@@ -22,6 +23,7 @@ from .const import (
     CONF_DTC_TYPE,
     CONF_DTC_TYPE_PERMANENT,
     CONF_DTC_TYPE_STORED,
+    CONF_ON_DTC_CLEAR,
 )
 
 CODEOWNERS = ["@robin-thoni"]
@@ -29,6 +31,10 @@ DEPENDENCIES = ["canbus_isotp"]
 
 obd2_ns = cg.esphome_ns.namespace('obd2')
 OBD2ServerComponent = obd2_ns.class_('OBD2ServerComponent', cg.Component)
+
+DTCClearTrigger = obd2_ns.class_(
+    "DTCClearTrigger", automation.Trigger.template()
+)
 
 SENSORS_DEF = {
     CONF_SENSORS_MIL_STATUS: binary_sensor.BinarySensor,
@@ -83,6 +89,11 @@ CONFIG_SCHEMA = cv.Schema({
             },
             key=CONF_DTC_TYPE,
         )),
+        cv.Optional(CONF_ON_DTC_CLEAR): automation.validate_automation(
+            {
+                cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(DTCClearTrigger),
+            }
+        ),
     }).extend(cv.COMPONENT_SCHEMA)
 
 
@@ -111,6 +122,10 @@ async def to_code(config):
         for dtc_config in config[CONF_DTC]:
             sensor = await cg.get_variable(dtc_config[CONF_SENSOR])
             cg.add(var.add_dtc(dtc_name_to_int(dtc_config[CONF_NAME]), sensor))
+
+    for conf in config.get(CONF_ON_DTC_CLEAR, []):
+        trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
+        await automation.build_automation(trigger, [], conf)
 
 
     await cg.register_component(var, config)

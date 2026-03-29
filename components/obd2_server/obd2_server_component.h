@@ -61,6 +61,8 @@ public:
     void dump_config() override;
     void loop() override;
 
+    void add_on_dtc_clear_callback(std::function<void()> &&callback);
+
     void add_canbus_isotp(canbus_isotp::CanbusISOTPComponent* canbus_isotp);
 
     bool is_pid_supported(uint8_t obd2_service, uint8_t obd2_pid) const;
@@ -83,6 +85,8 @@ protected:
     bool reply_obd2(uint8_t request_service, uint8_t request_pid, const std::vector<uint8_t> data);
 
     bool handle_supported_pids(uint32_t can_id, const std::vector<uint8_t> &data, uint8_t obd2_service, uint8_t obd2_pid);
+
+    LazyCallbackManager<void()> dtc_clear_callback{};
 
     std::vector<canbus_isotp::CanbusISOTPComponent*> canbus_isotp_;
 

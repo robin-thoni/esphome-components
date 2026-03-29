@@ -116,6 +116,9 @@ void OBD2ServerComponent::setup() {
                         }
                     }
                     reply_obd2(obd2_service, 0, data);
+                } else if (obd2_service == 0x04) {
+                    dtc_clear_callback.call();
+                    reply_obd2(obd2_service, 0, {});
                 } else if (obd2_service == 0x07) {
                     std::vector<uint8_t> data;
                     for (const auto& dtc_tuple : dtcs_stored_) {
@@ -166,6 +169,10 @@ void OBD2ServerComponent::dump_config() {
 }
 
 void OBD2ServerComponent::loop() {
+}
+
+void OBD2ServerComponent::add_on_dtc_clear_callback(std::function<void()> &&callback) {
+    this->dtc_clear_callback.add(std::move(callback));
 }
 
 void OBD2ServerComponent::add_canbus_isotp(canbus_isotp::CanbusISOTPComponent* canbus_isotp) {

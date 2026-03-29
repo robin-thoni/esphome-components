@@ -3,6 +3,7 @@ from esphome.const import (
     CONF_NAME,
     CONF_SENSOR,
     CONF_SENSORS,
+    CONF_TRIGGER_ID,
 )
 
 CONF_CANBUS_ISOTP_IDS = "canbus_isotp_ids"
@@ -16,3 +17,4 @@ CONF_DTC = "dtc"
 CONF_DTC_TYPE = "type"
 CONF_DTC_TYPE_PERMANENT = "permanent"
 CONF_DTC_TYPE_STORED = "stored"
+CONF_ON_DTC_CLEAR = "on_dtc_clear"
