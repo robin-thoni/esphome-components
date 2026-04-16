@@ -52,7 +52,7 @@ SEND_MESSAGE_SCHEMA = cv.Schema({
     cv.Required(CONF_DATA): cv.templatable(validate_raw_data),
 })
 
-@automation.register_action("canbus_isotp.send", SendMessage, SEND_MESSAGE_SCHEMA)
+@automation.register_action("canbus_isotp.send", SendMessage, SEND_MESSAGE_SCHEMA, synchronous=True)
 async def send_action_to_code(config, action_id, template_arg, args):
     parent = await cg.get_variable(config[CONF_ID])
     var = cg.new_Pvariable(action_id, template_arg, parent)
