@@ -71,6 +71,7 @@ async def send_action_to_code(config, action_id, template_arg, args):
 async def to_code(config):
     cg.add_build_flag("-DISO_TP_USER_SEND_CAN_ARG")
     cg.add_build_flag("-DISO_TP_RECEIVE_COMPLETE_CALLBACK")
+    cg.add_build_flag("-DISO_TP_FRAME_PADDING")
     cg.add_library("isotp-c", "1.6.0", "https://github.com/SimonCahill/isotp-c#v1.6.0")
 
     var = cg.new_Pvariable(config[CONF_ID])
